@@ -1,0 +1,127 @@
+---
+title: "Technical Validation"
+author: "Nate Olson"
+date: '`r Sys.Date()`'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+
+```{r}
+calc_n50 <- function(read_length_df){
+    cum_length_df <- read_length_df %>% 
+        arrange(read_length) %>% 
+        mutate(total_length = as.numeric(read_length * count),
+           cum_length = cumsum(total_length))
+
+        with(cum_length_df, min(read_length[cum_length >= max(cum_length)*0.5]))
+}
+```
+
+```{r}
+read_length_df <- list.files("data", pattern = "stats_read_length",full.names = TRUE) %>% 
+    set_names(str_extract(., "HG00.")) %>% 
+    map_dfr(read_tsv, col_names = c("read_length", "count"), .id = "hgref")
+```
+
+## Coverage Figure
+```{r}
+coverage_df <- read_length_df %>% 
+    group_by(hgref) %>% 
+    mutate(coverage = read_length * count / 3.1e9) %>% 
+    arrange(-read_length) %>% 
+    mutate(cum_coverage = cumsum(coverage))
+```
+
+```{r}
+ggplot(coverage_df) + 
+        geom_path(aes(x = read_length/1000, y = cum_coverage)) + 
+        labs(x = "Read Length (Kb)", y = "Coverage by Reads > Length") + 
+        theme_bw() + 
+    facet_wrap(~hgref) + 
+    xlim(0,50)
+```
+
+## Coverage summary table
+```{r}
+coverage_df %>% group_by(hgref) %>% 
+    mutate(total_coverage = max(cum_coverage),
+           max_read_length = max(read_length)) %>% 
+    group_by(hgref, total_coverage, max_read_length) %>% 
+    nest() %>% 
+    mutate(n50 = map_int(data, calc_n50)) %>% 
+    select(-data)
+```
+
+## Read length distribution
+```{r}
+read_len_dist_plot <- read_length_df %>% 
+    mutate(read_length_kb = round(read_length/1000, 0)) %>% 
+    group_by(hgref, read_length_kb) %>% 
+    summarise(count = sum(count))
+
+read_len_singletons <- read_len_dist_plot %>% filter(count == 1)
+
+ggplot(read_len_dist_plot) + 
+    geom_bar(aes(x = read_length_kb, y = count), stat = "identity") + 
+    geom_rug(data = read_len_singletons, aes(x  = read_length_kb)) +
+    facet_wrap(~hgref) + 
+    theme_bw() + 
+    scale_y_log10() + annotation_logticks(sides = "l") + 
+    labs(x = "Read Length (kb)", y = "Number of Reads")
+```
+
+```{r}
+read_length_df %>% filter(read_length > 100000) %>% 
+    group_by(hgref) %>% 
+    summarise(n_gt100kb = sum(count))
+```
+
+```{r}
+read_length_df %>% 
+    group_by(hgref) %>% 
+    summarise(mean_length = weighted.mean(read_length, count))
+```
+
+
+## Summary stats table
+```{r}
+summary_stats_df <- list.files("data", pattern = "stats_summary", full.names = TRUE) %>% 
+    set_names(str_extract(., "HG00.")) %>% 
+    map_dfr(read_delim, delim = ":", 
+            col_names = c("Key", "Value"), .id = "hgref") %>% 
+    mutate(Value = str_remove(Value, "\t#.*"),
+           Value = as.numeric(str_remove(Value, "\t")))
+```
+```{r}
+summary_stats_df %>% 
+    filter(Key %in% c("sequences","reads mapped","reads MQ0", "error rate")) %>% 
+    spread(Key, Value) %>% 
+    mutate(mapping_rate = `reads mapped`/sequences,
+           MQ0_rate = `reads MQ0`/ `reads mapped`) %>% 
+    select(-`reads mapped`)
+```
+
+
+
+## Coverage Distribution
+```{r}
+genome_cov_df <- list.files("data", pattern = "stats_cov", full.names = TRUE) %>% 
+    set_names(str_extract(., "HG00.")) %>% 
+    map_dfr(read_tsv, col_names = c("coverage_bin", "coverage_max", "nbases"), .id = "hgref")
+```
+
+```{r}
+genome_cov_df %>% 
+    filter(nbases > 1e7 | coverage_max < 40) %>% 
+    ggplot() + 
+    geom_path(aes(x = coverage_max, y = nbases)) + 
+    facet_wrap(~hgref, ncol = 1, scales = "free_y") + 
+    theme_bw() + 
+    labs(x = "Coverage", y = "Number of Mapped Bases")
+```
+

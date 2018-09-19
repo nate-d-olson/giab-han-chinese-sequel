@@ -1,0 +1,5 @@
+bam and index files downloaded from ftp site
+samtools stats used to calculate summary statistics for bam files
+bash script extract_samtools_stats was used to extract different summary statistic tables.
+
+use `grep ^# [stat_filename]` to extract rows in stat file with information for parsing the stat file. 
