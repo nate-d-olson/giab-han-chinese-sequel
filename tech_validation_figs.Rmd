@@ -16,9 +16,9 @@ calc_n50 <- function(read_length_df){
     cum_length_df <- read_length_df %>% 
         arrange(read_length) %>% 
         mutate(total_length = as.numeric(read_length * count),
-           cum_length = cumsum(total_length))
+               cum_length = cumsum(total_length))
 
-        with(cum_length_df, min(read_length[cum_length >= max(cum_length)*0.5]))
+    with(cum_length_df, min(read_length[cum_length >= max(cum_length)*0.5]))
 }
 ```
 
@@ -53,7 +53,7 @@ coverage_df %>% group_by(hgref) %>%
            max_read_length = max(read_length)) %>% 
     group_by(hgref, total_coverage, max_read_length) %>% 
     nest() %>% 
-    mutate(n50 = map_int(data, calc_n50)) %>% 
+    mutate(n50 = map_dbl(data, calc_n50)) %>% 
     select(-data)
 ```
 
@@ -119,9 +119,9 @@ genome_cov_df <- list.files("data", pattern = "stats_cov", full.names = TRUE) %>
 genome_cov_df %>% 
     filter(nbases > 1e7 | coverage_max < 40) %>% 
     ggplot() + 
-    geom_path(aes(x = coverage_max, y = nbases)) + 
+    geom_path(aes(x = coverage_max, y = nbases/1000000)) + 
     facet_wrap(~hgref, ncol = 1, scales = "free_y") + 
     theme_bw() + 
-    labs(x = "Coverage", y = "Number of Mapped Bases")
+    labs(x = "Coverage", y = "Mb")
 ```
 
