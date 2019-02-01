@@ -125,3 +125,22 @@ genome_cov_df %>%
     labs(x = "Coverage", y = "Mb")
 ```
 
+## Long Read Check
+Verification of reads with read lengths longer than expected based on sequencing method. 
+Comment from Aaron Wenger - "For 10hr movies, I would expect that the maximum read lengths are around 72 kb (2 basepairs / second * 10 hrs * 3600 seconds / hr)."
+```{r}
+hg005_bam_stats <- read_tsv("data/HG005_PacBio_GRCh37.bam.stats.tsv.gz")
+hg005_bam_stats %>% filter(bases > 70000)
+```
+
+```{r}
+hg006_bam_stats <- read_tsv("data/HG006_PacBio_GRCh37.bam.stats.tsv.gz")
+hg006_bam_stats %>% filter(bases > 70000)
+```
+
+```{r}
+hg007_bam_stats <- read_tsv("data/HG007_PacBio_GRCh37.bam.stats.tsv.gz")
+hg007_bam_stats %>% filter(bases > 70000)
+```
+
+Extracting reads from bams using `bamtools filter -length 70000 -in [IN BAM] -out [OUT BAM]` to get read alignments.
