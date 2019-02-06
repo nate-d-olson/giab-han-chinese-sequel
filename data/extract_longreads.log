@@ -1,0 +1,67 @@
+2.18.26-SNAPSHOT
+INFO	2019-02-05 16:39:22	FilterSamReads	
+
+********** NOTE: Picard's command line syntax is changing.
+**********
+********** For more information, please see:
+********** https://github.com/broadinstitute/picard/wiki/Command-Line-Syntax-Transition-For-Users-(Pre-Transition)
+**********
+********** The command line looks like this in the new syntax:
+**********
+**********    FilterSamReads -I ../../HG002-data/HG005_PacBio_GRCh37.bam -O HG005_PacBio_GRCh37_gt70kb.bam -READ_LIST_FILE HG005_read_id_gt70k.tsv -FILTER includeReadList
+**********
+
+
+16:39:22.924 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/scratch/nolson/sw/picard.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Feb 05 16:39:22 EST 2019] FilterSamReads INPUT=../../HG002-data/HG005_PacBio_GRCh37.bam FILTER=includeReadList READ_LIST_FILE=HG005_read_id_gt70k.tsv OUTPUT=HG005_PacBio_GRCh37_gt70kb.bam    WRITE_READS_FILES=false VERBOSITY=INFO QUIET=false VALIDATION_STRINGENCY=STRICT COMPRESSION_LEVEL=5 MAX_RECORDS_IN_RAM=500000 CREATE_INDEX=false CREATE_MD5_FILE=false GA4GH_CLIENT_SECRETS=client_secrets.json USE_JDK_DEFLATER=false USE_JDK_INFLATER=false
+[Tue Feb 05 16:39:22 EST 2019] Executing as nolson@p854911 on Linux 4.4.0-141-generic amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_201-b09; Deflater: Intel; Inflater: Intel; Provider GCS is not available; Picard version: 2.18.26-SNAPSHOT
+WARNING: BAM index file /scratch/nolson/giab/giab-han-chinese-sequel/data/../../HG002-data/HG005_PacBio_GRCh37.bam.bai is older than BAM /scratch/nolson/giab/giab-han-chinese-sequel/data/../../HG002-data/HG005_PacBio_GRCh37.bam
+WARNING: BAM index file /scratch/nolson/giab/giab-han-chinese-sequel/data/../../HG002-data/HG005_PacBio_GRCh37.bam.bai is older than BAM /scratch/nolson/giab/giab-han-chinese-sequel/data/../../HG002-data/HG005_PacBio_GRCh37.bam
+INFO	2019-02-05 16:39:59	FilterSamReads	Filtering [presorted=true] HG005_PacBio_GRCh37.bam -> OUTPUT=HG005_PacBio_GRCh37_gt70kb.bam [sortorder=coordinate]
+INFO	2019-02-05 17:45:45	FilterSamReads	88 SAMRecords written to HG005_PacBio_GRCh37_gt70kb.bam
+[Tue Feb 05 17:45:45 EST 2019] picard.sam.FilterSamReads done. Elapsed time: 66.37 minutes.
+Runtime.totalMemory()=2161115136
+INFO	2019-02-05 17:45:46	FilterSamReads	
+
+********** NOTE: Picard's command line syntax is changing.
+**********
+********** For more information, please see:
+********** https://github.com/broadinstitute/picard/wiki/Command-Line-Syntax-Transition-For-Users-(Pre-Transition)
+**********
+********** The command line looks like this in the new syntax:
+**********
+**********    FilterSamReads -I ../../HG002-data/HG006_PacBio_GRCh37.bam -O HG006_PacBio_GRCh37_gt70kb.bam -READ_LIST_FILE HG006_read_id_gt70k.tsv -FILTER includeReadList
+**********
+
+
+17:45:46.639 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/scratch/nolson/sw/picard.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Feb 05 17:45:46 EST 2019] FilterSamReads INPUT=../../HG002-data/HG006_PacBio_GRCh37.bam FILTER=includeReadList READ_LIST_FILE=HG006_read_id_gt70k.tsv OUTPUT=HG006_PacBio_GRCh37_gt70kb.bam    WRITE_READS_FILES=false VERBOSITY=INFO QUIET=false VALIDATION_STRINGENCY=STRICT COMPRESSION_LEVEL=5 MAX_RECORDS_IN_RAM=500000 CREATE_INDEX=false CREATE_MD5_FILE=false GA4GH_CLIENT_SECRETS=client_secrets.json USE_JDK_DEFLATER=false USE_JDK_INFLATER=false
+[Tue Feb 05 17:45:46 EST 2019] Executing as nolson@p854911 on Linux 4.4.0-141-generic amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_201-b09; Deflater: Intel; Inflater: Intel; Provider GCS is not available; Picard version: 2.18.26-SNAPSHOT
+WARNING: BAM index file /scratch/nolson/giab/giab-han-chinese-sequel/data/../../HG002-data/HG006_PacBio_GRCh37.bam.bai is older than BAM /scratch/nolson/giab/giab-han-chinese-sequel/data/../../HG002-data/HG006_PacBio_GRCh37.bam
+WARNING: BAM index file /scratch/nolson/giab/giab-han-chinese-sequel/data/../../HG002-data/HG006_PacBio_GRCh37.bam.bai is older than BAM /scratch/nolson/giab/giab-han-chinese-sequel/data/../../HG002-data/HG006_PacBio_GRCh37.bam
+INFO	2019-02-05 17:48:43	FilterSamReads	Filtering [presorted=true] HG006_PacBio_GRCh37.bam -> OUTPUT=HG006_PacBio_GRCh37_gt70kb.bam [sortorder=coordinate]
+INFO	2019-02-05 18:18:52	FilterSamReads	120 SAMRecords written to HG006_PacBio_GRCh37_gt70kb.bam
+[Tue Feb 05 18:18:52 EST 2019] picard.sam.FilterSamReads done. Elapsed time: 33.10 minutes.
+Runtime.totalMemory()=2313158656
+INFO	2019-02-05 18:18:53	FilterSamReads	
+
+********** NOTE: Picard's command line syntax is changing.
+**********
+********** For more information, please see:
+********** https://github.com/broadinstitute/picard/wiki/Command-Line-Syntax-Transition-For-Users-(Pre-Transition)
+**********
+********** The command line looks like this in the new syntax:
+**********
+**********    FilterSamReads -I ../../HG002-data/HG007_PacBio_GRCh37.bam -O HG007_PacBio_GRCh37_gt70kb.bam -READ_LIST_FILE HG007_read_id_gt70k.tsv -FILTER includeReadList
+**********
+
+
+18:18:53.995 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/scratch/nolson/sw/picard.jar!/com/intel/gkl/native/libgkl_compression.so
+[Tue Feb 05 18:18:54 EST 2019] FilterSamReads INPUT=../../HG002-data/HG007_PacBio_GRCh37.bam FILTER=includeReadList READ_LIST_FILE=HG007_read_id_gt70k.tsv OUTPUT=HG007_PacBio_GRCh37_gt70kb.bam    WRITE_READS_FILES=false VERBOSITY=INFO QUIET=false VALIDATION_STRINGENCY=STRICT COMPRESSION_LEVEL=5 MAX_RECORDS_IN_RAM=500000 CREATE_INDEX=false CREATE_MD5_FILE=false GA4GH_CLIENT_SECRETS=client_secrets.json USE_JDK_DEFLATER=false USE_JDK_INFLATER=false
+[Tue Feb 05 18:18:54 EST 2019] Executing as nolson@p854911 on Linux 4.4.0-141-generic amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_201-b09; Deflater: Intel; Inflater: Intel; Provider GCS is not available; Picard version: 2.18.26-SNAPSHOT
+WARNING: BAM index file /scratch/nolson/giab/giab-han-chinese-sequel/data/../../HG002-data/HG007_PacBio_GRCh37.bam.bai is older than BAM /scratch/nolson/giab/giab-han-chinese-sequel/data/../../HG002-data/HG007_PacBio_GRCh37.bam
+WARNING: BAM index file /scratch/nolson/giab/giab-han-chinese-sequel/data/../../HG002-data/HG007_PacBio_GRCh37.bam.bai is older than BAM /scratch/nolson/giab/giab-han-chinese-sequel/data/../../HG002-data/HG007_PacBio_GRCh37.bam
+INFO	2019-02-05 18:19:44	FilterSamReads	Filtering [presorted=true] HG007_PacBio_GRCh37.bam -> OUTPUT=HG007_PacBio_GRCh37_gt70kb.bam [sortorder=coordinate]
+INFO	2019-02-05 18:52:38	FilterSamReads	225 SAMRecords written to HG007_PacBio_GRCh37_gt70kb.bam
+[Tue Feb 05 18:52:38 EST 2019] picard.sam.FilterSamReads done. Elapsed time: 33.73 minutes.
+Runtime.totalMemory()=2371878912
