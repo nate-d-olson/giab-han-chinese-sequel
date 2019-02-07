@@ -121,10 +121,10 @@ genome_cov_df <- list.files("data", pattern = "stats_cov", full.names = TRUE) %>
 genome_cov_df %>% 
     filter(nbases > 1e7 | coverage_max < 40) %>% 
     ggplot() + 
-    geom_path(aes(x = coverage_max, y = nbases/1000000)) + 
-    facet_wrap(~hgref, ncol = 1, scales = "free_y") + 
+    geom_path(aes(x = coverage_max, y = nbases/1000000, color = hgref)) + 
+    # facet_wrap(~hgref, ncol = 1, scales = "free_y") + 
     theme_bw() + 
-    labs(x = "Coverage", y = "Mb")
+    labs(x = "Coverage", y = "Mb", color = "NIST ID")
 ```
 
 ## Long Read Check
@@ -132,12 +132,12 @@ Verification of reads with read lengths longer than expected based on sequencing
 Comment from Aaron Wenger - "For 10hr movies, I would expect that the maximum read lengths are around 72 kb (2 basepairs / second * 10 hrs * 3600 seconds / hr)."
 ```{r}
 hg005_bam_stats <- read_tsv("data/HG005_PacBio_GRCh37.bam.stats.tsv.gz")
-hg005_bam_stats %>% filter(bases > 70000)
+hg005_bam_stats %>% filter(bases > 100000)
 ```
 
 ```{r}
 hg006_bam_stats <- read_tsv("data/HG006_PacBio_GRCh37.bam.stats.tsv.gz")
-hg006_bam_stats %>% filter(bases > 70000)
+hg006_bam_stats %>% filter(bases > 100000)
 ```
 
 
@@ -145,6 +145,32 @@ hg006_bam_stats %>% filter(bases > 70000)
 hg007_bam_stats <- read_tsv("data/HG007_PacBio_GRCh37.bam.stats.tsv.gz")
 hg007_bam_stats %>% filter(bases > 70000)
 ```
+
+
+## Alignment Stats
+```{r}
+aln_stat_files <- list.files("data", 
+                     pattern = "bam.stats.tsv.gz", full.names = TRUE,
+                     recursive = TRUE)
+
+# BAM statistics combined bam stat files
+col_names <- c("read_id", 
+               "aln_lengthsum", 
+               "aln_lengthmax",
+               "aln_count",
+               "ref_lengthsum",
+               "ref_lengthmax",
+               "ref_lengthcount",
+               "bases")
+
+aln_names <- str_extract(aln_stat_files, "(?<=data/).*(?=_PacBio_GRCh37)")
+aln_stat_df <- aln_stat_files %>%  
+    set_names(aln_names) %>% 
+    map_dfr(read_tsv, 
+            .id = "Run")
+
+```
+
 
 Extracting reads from bams using `bamtools filter -length 70000 -in [IN BAM] -out [OUT BAM]` to get read alignments. 
 No reads were output.
@@ -168,35 +194,6 @@ aln_stat_df %>% filter(bases > 70000, Run == "HG006") %>%
 aln_stat_df %>% filter(bases > 70000, Run == "HG007") %>% 
     select(read_id) %>% 
     write_tsv("data/HG007_read_id_gt70k.tsv")
-
-```
-
-
-
-
-
-## Alignment Stats
-```{r}
-aln_stat_files <- list.files("data", 
-                     pattern = "bam.stats.tsv.gz", full.names = TRUE,
-                     recursive = TRUE)
-
-# BAM statistics combined bam stat files
-col_names <- c("read_id", 
-               "aln_lengthsum", 
-               "aln_lengthmax",
-               "aln_count",
-               "ref_lengthsum",
-               "ref_lengthmax",
-               "ref_lengthcount",
-               "bases")
-
-aln_names <- str_extract(stat_files, "(?<=data/).*(?=_PacBio_GRCh37)")
-aln_stat_df <- aln_stat_files %>%  
-    set_names(aln_names) %>% 
-    map_dfr(read_tsv, 
-            .id = "Run")
-
 ```
 
 Genome Total Coverage Max Read Length N50
@@ -223,10 +220,10 @@ cov_df <- aln_stat_df %>%
     mutate(length_bins = cut(aln_lengthmax, 
                              breaks = c(cov_breaks, max(.$aln_lengthmax)),
                              labels = cov_breaks)) %>%
-    group_by(hgref, length_bins) %>% 
+    group_by(Run, length_bins) %>% 
     summarise(coverage = sum(as.numeric(aln_lengthmax))/3.1e9, 
               n_reads = n()) %>% 
-    group_by(hgref) %>% 
+    group_by(Run) %>% 
     arrange(desc(length_bins)) %>% 
     mutate(cum_coverage = cumsum(coverage)) %>% 
     mutate(length_bins = as.numeric(as.character(length_bins)))
@@ -235,10 +232,10 @@ cov_df <- aln_stat_df %>%
 ## Coverage Figure
 ```{r}
 ggplot(cov_df) + 
-    geom_path(aes(x = length_bins/1000, y = cum_coverage)) +
-    facet_wrap(~Run) + 
+    geom_path(aes(x = length_bins/1000, y = cum_coverage, color = Run)) +
+    # facet_wrap(~Run) + 
     theme_bw() + 
-    labs(x = "Read Length (Kb)", y = "Coverage by Reads > length")
+    labs(x = "Read Length (Kb)", y = "Coverage by Reads > length", color = "NIST ID")
 ```
 
 ## Read length
@@ -248,8 +245,18 @@ cov_df %>% ungroup() %>%
     geom_bar(aes(x = length_bins/1000, y = n_reads), stat = "identity") + 
     facet_wrap(~Run, ncol = 1) + 
     theme_bw() +
-    scale_y_log10() + annotation_logticks(sides = "l") + 
+    # scale_y_log10() + annotation_logticks(sides = "l") + 
     labs(x = "Read Length (kb)", y = "Number of Reads")
 ```
 
+```{r}
+cov_df %>% ungroup() %>% 
+    ggplot() + 
+    geom_boxplot(aes(x = Run, y = length_bins/1000, fill = Run)) + 
+    # facet_wrap(~Run, ncol = 1) + 
+    theme_bw() +
+    # scale_y_log10() + annotation_logticks(sides = "l") + 
+    labs(x = "NIST Sample ID", y = "Mapped Read Length (kb)") + 
+    theme(legend.position = "none")
+```
 
