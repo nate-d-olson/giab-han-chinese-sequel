@@ -249,14 +249,20 @@ cov_df %>% ungroup() %>%
     labs(x = "Read Length (kb)", y = "Number of Reads")
 ```
 
+
 ```{r}
 cov_df %>% ungroup() %>% 
+    # mutate(length_bins = if_else(is.na(length_bins), 1, length_bins)) %>% 
     ggplot() + 
-    geom_boxplot(aes(x = Run, y = length_bins/1000, fill = Run)) + 
+    geom_boxplot(aes(x = Run, y = length_bins/1000, 
+                     weight = n_reads, fill = Run)) + 
     # facet_wrap(~Run, ncol = 1) + 
     theme_bw() +
-    # scale_y_log10() + annotation_logticks(sides = "l") + 
+    # scale_y_log10() + annotation_logticks(sides = "l") +
     labs(x = "NIST Sample ID", y = "Mapped Read Length (kb)") + 
     theme(legend.position = "none")
+```
+```{r}
+ggsave("read_length_boxplot.png", height = 4, width = 3)
 ```
 
