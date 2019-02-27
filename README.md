@@ -1,7 +1,8 @@
 ## GIAB Han Chinese PacBio Sequel Data 
-Data analysis for the GIAB Han Chinese PacBio Sequel data manuscript. 
 
-__Analysis methods overview__  
+Data analysis for the GIAB Han Chinese PacBio Sequel data manuscript.  
+
+__Analysis methods overview__   
 
 - bam and index files downloaded from ncbi giab ftp site  
 - samtools stats used to calculate summary statistics for bam files
