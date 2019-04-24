@@ -149,11 +149,11 @@ ggarrange(
                   ncol = 1, nrow = 2, align = "v",
                   legend = "none"),
     cov_v_length_fig, 
-    ncol = 2, labels = c("","C"),
+    ncol = 2, labels = c("","C"),widths = c(3,2),
     legend = "none")
 ```
 
 ```{r}
-ggsave("hc_sequel_sci_data_fig.pdf", width = 170, height = 120, units = "mm")
+ggsave("hc_sequel_sci_data_fig.pdf", width = 10, height = 6, units = "in")
 ```
 
