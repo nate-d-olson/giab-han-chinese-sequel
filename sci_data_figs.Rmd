@@ -154,6 +154,6 @@ ggarrange(
 ```
 
 ```{r}
-ggsave("hc_sequel_sci_data_fig.pdf", width = 170, height = 120, units = "mm")
+ggsave("hc_sequel_sci_data_fig.pdf", width = 200, height = 150, units = "mm")
 ```
 
