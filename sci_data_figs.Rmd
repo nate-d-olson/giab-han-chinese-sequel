@@ -1,0 +1,159 @@
+---
+title: "Technical Validation"
+author: "Nate Olson"
+date: '`r Sys.Date()`'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggridges)
+library(ggpubr)
+```
+
+Read length and coverage figures using stats from statistics.
+
+## Loading and Tidying data
+```{r}
+aln_stat_files <- list.files("data", 
+                     pattern = "bam.stats.tsv.gz", full.names = TRUE,
+                     recursive = TRUE)
+
+# BAM statistics combined bam stat files
+col_names <- c("read_id", 
+               "aln_lengthsum", 
+               "aln_lengthmax",
+               "aln_count",
+               "ref_lengthsum",
+               "ref_lengthmax",
+               "ref_lengthcount",
+               "bases")
+
+aln_names <- str_extract(aln_stat_files, "(?<=data/).*(?=_PacBio_GRCh37)")
+aln_stat_df <- aln_stat_files %>%  
+    set_names(aln_names) %>% 
+    map_dfr(read_tsv, 
+            .id = "Run")
+
+```
+
+
+
+## Summary Table 
+
+Genome Total Coverage Max Read Length N50
+```{r}
+calc_n50 <- function(seq_lengths){
+    sorted_lengths <- sort(seq_lengths)
+    cum_lengths <- cumsum(sorted_lengths)
+    min(sorted_lengths[cum_lengths >= max(cum_lengths)*0.5])
+}
+
+aln_summary_stats_df <- aln_stat_df %>% 
+    mutate(aln_lengthmax = as.numeric(aln_lengthmax)) %>% 
+    group_by(Run) %>% 
+    summarise(N50 = calc_n50(aln_lengthmax),
+              max_read = max(aln_lengthmax),
+           throughput = sum(aln_lengthmax))
+aln_summary_stats_df
+```
+
+## Coverage Distribution
+```{r}
+genome_cov_df <- list.files("data", pattern = "stats_cov", full.names = TRUE) %>% 
+    set_names(str_extract(., "HG00.")) %>% 
+    map_dfr(read_tsv, col_names = c("coverage_bin", "coverage_max", "nbases"), .id = "hgref")
+```
+
+```{r}
+cov_dist_fig <- genome_cov_df %>% 
+    filter(nbases > 1e7 | coverage_max < 40) %>% 
+    ggplot() + 
+    geom_path(aes(x = coverage_max, y = nbases/1000000, color = hgref)) + 
+    # facet_wrap(~hgref, ncol = 1, scales = "free_y") + 
+    labs(x = "Coverage", y = "Bases (Mb)", color = "NIST ID") + 
+    theme_pubr()
+```
+
+## Coverage Figure
+```{r}
+cov_breaks <- c(0:75) * 1000
+cov_df <- aln_stat_df %>% 
+    mutate(length_bins = cut(aln_lengthmax, 
+                             breaks = c(cov_breaks, max(.$aln_lengthmax)),
+                             labels = cov_breaks)) %>%
+    group_by(Run, length_bins) %>% 
+    summarise(n_bases = sum(as.numeric(aln_lengthmax)),
+            coverage = n_bases/3.1e9, 
+              n_reads = n()) %>% 
+    group_by(Run) %>% 
+    arrange(desc(length_bins)) %>% 
+    mutate(cum_coverage = cumsum(coverage)) %>% 
+    mutate(length_bins = as.numeric(as.character(length_bins)))
+```
+
+
+```{r}
+cov_v_length_fig <- ggplot(cov_df) + 
+    geom_path(aes(x = length_bins, y = cum_coverage, color = Run)) +
+    scale_x_log10() + 
+    theme_bw() + 
+    annotation_logticks(sides = "b") + 
+    labs(x = "Read Length (bp)",
+         y = "Coverage by Reads > Length", 
+         color = "NIST ID") + 
+    theme_pubr()
+```
+
+## Read length
+
+```{r}
+# read_len_fig <- ggplot(aln_stat_df) + 
+#     geom_violin(aes(x = Run, y = aln_lengthmax, fill = Run)) + 
+#     scale_y_log10() + 
+#     theme_bw() + 
+#     annotation_logticks(sides = "lr") + 
+#     labs(x = "NIST Sample ID",
+#          y = "Read Length (bp)") + 
+#     theme(legend.position = "none")
+## For precomputing densities     
+# read_len_densities <- aln_stat_df %>% 
+#     group_by(Run)
+#     iris %>% group_by(Species) %>%
+#   do(ggplot2:::compute_density(.$Sepal.Length, NULL)) %>%
+#   rename(Sepal.Length = x) -> iris_densities
+    
+read_len_fig <- aln_stat_df %>% 
+    sample_frac(0.10) %>% 
+    ggplot() + 
+    geom_density_ridges(aes(y = Run, 
+                            x = aln_lengthmax, 
+                            fill = Run)) + 
+    scale_x_log10() +
+    theme_bw() + 
+    annotation_logticks(sides = "b") +
+    labs(x = "Read Length (bp)",
+         y = "NIST Sample ID") + 
+    theme_pubr()
+```
+
+
+## Combined Plot
+
+```{r}
+ggarrange(
+    ggarrange(read_len_fig, 
+                  cov_dist_fig, 
+                  hjust = -0.25,labels = c("A","B"),
+                  ncol = 1, nrow = 2, align = "v",
+                  legend = "none"),
+    cov_v_length_fig, 
+    ncol = 2, labels = c("","C"),
+    legend = "none")
+```
+
+```{r}
+ggsave("hc_sequel_sci_data_fig.pdf", width = 170, height = 120, units = "mm")
+```
+
