@@ -145,11 +145,11 @@ read_len_fig <- aln_stat_df %>%
 ggarrange(
     ggarrange(read_len_fig, 
                   cov_dist_fig, 
-                  hjust = -0.25,labels = c("A","B"),
+                  hjust = -0.25,labels = c("a","b"),
                   ncol = 1, nrow = 2, align = "v",
                   legend = "none"),
     cov_v_length_fig, 
-    ncol = 2, labels = c("","C"),widths = c(3,2),
+    ncol = 2, labels = c("","c"),widths = c(3,2),
     legend = "none")
 ```
 
